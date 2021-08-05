@@ -1,6 +1,6 @@
-# Welcome to Open Y Alert APP smoke tests documentation
+# Welcome to Open Y Alert App smoke tests documentation
 
-In order for Alert APP being tested in a short timeframe, please follow steps below
+In order for Alert App being tested in a short timeframe, please follow steps below
 
 ## Editing Alerts
 
