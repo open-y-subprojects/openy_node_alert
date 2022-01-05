@@ -43,7 +43,7 @@
     "preact-compat": "^3.18.5",
     "prettier": "^1.14.2",
     "promise": "8.1.0",
-    "raf": "3.4.0",
+    "raf": "3.4.1",
     "react": "^16.4.2",
     "react-cookie": "^3.0.4",
     "react-cookies": "^0.1.0",
