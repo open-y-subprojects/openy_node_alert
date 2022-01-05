@@ -158,7 +158,7 @@ function openy_node_alert_update_8009() {
  * Update alert nodes. Alerts shouldn't have content moderation enabled to succeed.
  */
 function openy_node_alert_update_8010() {
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   $configs = [
     'core.base_field_override.node.alert.promote',
     'core.entity_form_display.node.alert.default',
@@ -246,7 +246,7 @@ function openy_node_alert_update_8010() {
 function openy_node_alert_update_8011() {
   // Note: no need to check field existing, those configs anyway was changed
   // and should be imported.
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   $configs = [
     'core.entity_form_display.node.alert.default',
     'core.entity_view_display.node.alert.default',
@@ -271,7 +271,7 @@ function openy_node_alert_update_8011() {
 function openy_node_alert_update_8012() {
   openy_node_alert_update_fixes();
   \Drupal::service('module_installer')->install(['draggableviews']);
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   $configs = [
     'views.view.alerts_rearrange',
   ];
@@ -284,7 +284,7 @@ function openy_node_alert_update_8012() {
  * Update Open Y Node Alert feature to use link attributes widget.
  */
 function openy_node_alert_update_8013() {
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   // Update multiple configurations.
   $configs = [
     'core.entity_form_display.node.alert.default' =>[
@@ -306,7 +306,7 @@ function openy_node_alert_update_8013() {
  * Add location reference field for alerts.
  */
 function openy_node_alert_update_8014() {
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   $configs = [
     'field.field.node.alert.field_alert_location',
     'field.storage.node.field_alert_location',
@@ -350,7 +350,7 @@ function openy_node_alert_update_8014() {
  * Fix location reference field for alerts.
  */
 function openy_node_alert_update_8016() {
-  $config_dir = drupal_get_path('module', 'openy_node_alert') . '/config/install/';
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
 
   $configs = [
     'field.field.node.alert.field_alert_location' => [
