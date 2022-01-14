@@ -5,7 +5,6 @@
 /*global drupalSettings b:true*/
 console.log('OpenY Alerts initialising...');
 
-import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import AppHeader from './AppHeader';
