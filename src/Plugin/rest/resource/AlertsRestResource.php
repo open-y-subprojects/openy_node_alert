@@ -332,15 +332,21 @@ class AlertsRestResource extends ResourceBase {
     $current_path = $this->aliasManager->getAliasByPath($current_path);
     $current_path = mb_strtolower($current_path);
     // Check all values from the field "alert_visibility_pages".
+    $hide_exclude = FALSE;
     foreach ($pages as $page) {
       $page_path = $page === '<front>' ? '/' : '/' . ltrim($page, '/');
       $is_path_match = $this->pathMatcher->matchPath($current_path, $page_path);
-      if ($is_path_match) {
-        // If this path matches at least one of the visibility pages,
-        // we return TRUE if we want to include the alert on this page.
-        // Hide the alert on the given page otherwise.
-        return $state === 'include';
+      if ($state == 'include' && $is_path_match) {
+        // Show alert in a first possible match.
+        return TRUE;
       }
+      if ($state == 'exclude' && $is_path_match) {
+        $hide_exclude = TRUE;
+      }
+    }
+    // Check for exclude, current path is not in list of pages for exclude.
+    if ($state == 'exclude' && !$hide_exclude) {
+      return TRUE;
     }
     return FALSE;
   }
