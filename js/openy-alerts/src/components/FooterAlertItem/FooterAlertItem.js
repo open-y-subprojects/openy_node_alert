@@ -4,7 +4,7 @@ import parse from 'html-react-parser';
 import { closeAlert } from '../../actions/helpers';
 import connect from 'react-redux/es/connect/connect';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { faTimes, faExclamationCircle, faCircle } from '@fortawesome/free-solid-svg-icons'
 
 /**
  * Renders alert item.
@@ -66,7 +66,10 @@ class AlertItem extends Component {
             <div className="row site-alert__wrapper">
               {this.props.iconColor && (
                 <div className="site-alert__icon" style={iconStyle}>
-                  <FontAwesomeIcon icon={faExclamationCircle} />
+                  <span className="fa-layers fa-fw">
+                    <FontAwesomeIcon icon={faCircle} color="white" />
+                    <FontAwesomeIcon icon={faExclamationCircle} />
+                  </span>
                 </div>
               )}
               <div className={alertContentClasses}>
