@@ -3,6 +3,8 @@ import cookie from 'react-cookies';
 import parse from 'html-react-parser';
 import { closeAlert } from '../../actions/helpers';
 import connect from 'react-redux/es/connect/connect';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTimes, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 
 /**
  * Renders alert item.
@@ -64,7 +66,7 @@ class AlertItem extends Component {
             <div className="row site-alert__wrapper">
               {this.props.iconColor && (
                 <div className="site-alert__icon" style={iconStyle}>
-                  <i className="fa fa-exclamation-circle" aria-hidden="true" />
+                  <FontAwesomeIcon icon={faExclamationCircle} />
                 </div>
               )}
               <div className={alertContentClasses}>
@@ -92,11 +94,10 @@ class AlertItem extends Component {
                 aria-label="Close alert"
                 onFocus={() => focusItem()}
               >
-                <i className="fa fa-times" aria-hidden="true">
-                  <span className="visually-hidden">
-                    Close alert {parse(this.props.label)}
-                  </span>
-                </i>
+                <span className="visually-hidden">
+                  Close alert {parse(this.props.label)}
+                </span>
+                <FontAwesomeIcon icon={faTimes} />
               </a>
             </div>
           </div>
