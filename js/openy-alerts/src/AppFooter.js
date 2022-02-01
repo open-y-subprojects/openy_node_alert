@@ -123,7 +123,7 @@ class App extends Component {
                   data-role="none"
                   className={nextArrowClasses}
                   role="button"
-                  aria-disabled="false"
+                  aria-disabled="true"
                   aria-label="Next alert message"
                   onClick={this.next}
                 >
