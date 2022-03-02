@@ -9,15 +9,12 @@ use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\Url;
-use Drupal\node\NodeInterface;
 use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\Plugin\ResourceBase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 
 /**
@@ -197,180 +194,15 @@ class AlertsRestResource extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
 
-    // Get data from draggableviews_structure table.
-    $query = \Drupal::database()->select('draggableviews_structure', 'dvs');
-    $query->fields('dvs', ['view_name', 'view_display', 'entity_id', 'weight']);
-    $query->condition('dvs.view_name', 'alerts_rearrange');
-    $query->condition('dvs.view_display', 'page_1');
-    $query->orderBy('dvs.weight');
-    $weights = $query->execute()->fetchAll();
-    $loadByProperties = ['type' => 'alert', 'status' => 1];
-
-    $alerts_entities = $this->entityTypeManager
-      ->getStorage('node')
-      ->loadByProperties($loadByProperties);
-
-    $alerts = $alerts_entities;
-
-    // Sort alert based on draggable_views data.
-    if (!empty($weights)) {
-      $alerts = [];
-      foreach ($weights as $row) {
-        if (!isset($alerts_entities[(int)$row->entity_id])) {
-          continue;
-        }
-        $alerts[] = $alerts_entities[(int)$row->entity_id];
-        unset($alerts_entities[(int)$row->entity_id]);
-      }
-      // Add items that was missed in draggableviews table.
-      $alerts = array_merge($alerts, $alerts_entities);
+    $uri = $this->request->query->get('uri');
+    $result = $this->router->match($uri);
+    if (!isset($result['node'])) {
+      throw new \HttpException('Node not found');
     }
-
-    $service_alert_ids = $this->getServiceAlerts();
-    $sendAlerts = [];
-    /** @var \Drupal\node\Entity\Node $alert */
-    foreach ($alerts as $alert) {
-      // Filter alerts to remove alerts not listed by alert service for this uri.
-      if (!empty($service_alert_ids) && !in_array($alert->id(), $service_alert_ids)) {
-        continue;
-      }
-      if (!$alert->hasField('field_alert_visibility_pages')) {
-        if ($alert->hasField('field_alert_belongs') && !$alert->field_alert_belongs->isEmpty() && !$alert->field_alert_place->isEmpty()) {
-          $refid = $alert->field_alert_belongs->target_id;
-          $alias = $this->aliasManager->getAliasByPath('/node/' . $refid);
-          if ($_GET['uri'] != $alias) {
-            // Do not show alerts for current page.
-            continue;
-          }
-          $sendAlerts[$alert->field_alert_place->value]['local'][] = self::formatAlert($alert);
-        }
-        elseif ($alert->hasField('field_alert_belongs') && $alert->field_alert_belongs->isEmpty() && !$alert->field_alert_place->isEmpty()) {
-          $sendAlerts[$alert->field_alert_place->value]['global'][] = self::formatAlert($alert);
-        }
-        else {
-          throw new \HttpException('Field configuration for alerts is wrong');
-        }
-      }
-      elseif ($this->checkVisibility($alert)) {
-        $sendAlerts[$alert->field_alert_place->value]['local'][] = self::formatAlert($alert);
-      }
-      else {
-        if ($alert->hasField('field_alert_location') && !$alert->field_alert_location->isEmpty()) {
-          $sendAlerts[$alert->field_alert_place->value]['local'][] = self::formatAlert($alert);
-        }
-      }
-    }
+    [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node']);
 
     $this->moduleHandler->alter('openy_node_alert_get', $sendAlerts, $alerts);
 
     return new ModifiedResourceResponse($sendAlerts, 200);
-  }
-
-  /**
-   * Helper function for alerts formatting.
-   *
-   * @param \Drupal\node\NodeInterface $alert
-   *   Alert node.
-   *
-   * @return array
-   *   Formatted alert.
-   */
-  public static function formatAlert(NodeInterface $alert) {
-    $url = $alert->field_alert_link->uri != NULL ? Url::fromUri($alert->field_alert_link->uri)
-      ->setAbsolute()
-      ->toString() : NULL;
-
-    $iconColor = '';
-    if ($alert->field_alert_icon_color && $alert->field_alert_icon_color->entity && $alert->field_alert_icon_color->entity->field_color && $alert->field_alert_icon_color->entity->field_color->value) {
-      $iconColor = $alert->field_alert_icon_color->entity->field_color->value;
-    }
-
-    return [
-      'title' => $alert->getTitle(),
-      'textColor' => $alert->field_alert_text_color->entity->field_color->value,
-      'bgColor' => $alert->field_alert_color->entity->field_color->value,
-      'description' => $alert->field_alert_description->value,
-      'iconColor' => $iconColor,
-      'linkUrl' => $url,
-      'linkText' => $alert->field_alert_link->title,
-      'id' => $alert->id(),
-    ];
-  }
-
-  /**
-   * Check visibility of alert.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   Alert node.
-   *
-   * @return bool
-   *   Visibility status, TRUE if visible.
-   */
-  private function checkVisibility(NodeInterface $node) {
-
-    $visibility_paths = '';
-    if ($node->hasField('field_alert_visibility_pages')) {
-      $visibility_paths = $node->get('field_alert_visibility_pages')->value;
-    }
-
-    $state = 'include';
-    if ($node->hasField('field_alert_visibility_state')) {
-      $state = $node->get('field_alert_visibility_state')->value;
-    }
-
-    $visibility_paths = mb_strtolower($visibility_paths);
-    $pages = preg_split("(\r\n?|\n)", $visibility_paths);
-
-    if (empty($pages)) {
-      // Global alert.
-      return TRUE;
-    }
-    // Convert path to lowercase. This allows comparison of the same path.
-    // with different case. Ex: /Page, /page, /PAGE.
-    // Compare the lowercase path alias (if any) and internal path.
-    $current_path = $_GET['uri'];
-    $current_path = $this->aliasManager->getAliasByPath($current_path);
-    $current_path = mb_strtolower($current_path);
-    // Check all values from the field "alert_visibility_pages".
-    foreach ($pages as $page) {
-      $page_path = $page === '<front>' ? '/' : '/' . ltrim($page, '/');
-      $is_path_match = $this->pathMatcher->matchPath($current_path, $page_path);
-      if ($is_path_match) {
-        // If this path matches at least one of the visibility pages,
-        // we return TRUE if we want to include the alert on this page.
-        // Hide the alert on the given page otherwise.
-        return $state === 'include';
-      }
-    }
-
-    // If the code got to this point, then no path matches were found. This
-    // means we have to hide the alert (return FALSE) if it has "include"
-    // visibility state. And show the alert (return TRUE) with the "exclude"
-    // state.
-    return $state !== 'include';
-  }
-
-  /**
-   * Return array of alert ids that provided by service collector for uri in request.
-   *
-   * @return array|void
-   *   Alert IDs array.
-   */
-  private function getServiceAlerts() {
-    $service_alerts = [];
-    $uri = $this->request->query->get('uri');
-    try {
-      $result = $this->router->match($uri);
-    }
-    catch (ResourceNotFoundException $e) {
-      return;
-    }
-    if (!isset($result['node'])) {
-      return;
-    }
-    foreach ($this->alertManager->getAlerts($result['node']) as $alerts) {
-      $service_alerts[] = $alerts;
-    }
-    return $service_alerts;
   }
 }
