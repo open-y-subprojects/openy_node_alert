@@ -285,6 +285,11 @@ class AlertManager {
         return $state === 'include';
       }
     }
-    return FALSE;
+
+    // If the code got to this point, then no path matches were found. This
+    // means we have to hide the alert (return FALSE) if it has "include"
+    // visibility state. And show the alert (return TRUE) with the "exclude"
+    // state.
+    return $state !== 'include';
   }
 }
