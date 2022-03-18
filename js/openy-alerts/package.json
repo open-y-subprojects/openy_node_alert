@@ -14,7 +14,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
     "axios": "^0.24.0",
-    "dotenv": "^10.0.0",
+    "dotenv": "^11.0.0",
     "html-react-parser": "^1.4.4",
     "preact": "^10.6.4",
     "react": "^17.0.2",
