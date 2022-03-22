@@ -70,6 +70,7 @@ class App extends Component {
                   bgColor={a.bgColor}
                   focus={this.goto}
                   index={idx++}
+                  slider={this.slider}
                 />
               );
             } else {
