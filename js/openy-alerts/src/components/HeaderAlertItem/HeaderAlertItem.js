@@ -28,6 +28,9 @@ class AlertItem extends Component {
       }
       cookie.save('alerts_dismiss', ad);
       this.props.closeAlert(parseInt(this.props.alertId));
+      if (this.props.index === this.props.slider.props.children[0].length - 1) {
+        setTimeout(() => (this.props.slider.slickPrev()), this.props.slider.props.speed);
+      }
     };
 
     let focusItem = () => {
