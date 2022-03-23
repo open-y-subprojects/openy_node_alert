@@ -57,7 +57,7 @@ function openy_node_alert_entity_presave(EntityInterface $entity) {
         }
       }
     }
-    
+
     // Collecting nodes from the Reference field.
     if (
       $entity->hasField('field_alert_belongs')
