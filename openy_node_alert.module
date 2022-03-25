@@ -37,16 +37,23 @@ function openy_node_alert_entity_presave(EntityInterface $entity) {
       && !$entity->get('field_alert_visibility_pages')->isEmpty()
     ) {
 
-      $visibility_paths = $entity->get('field_alert_visibility_pages')->getValue();
+      // Trim any leading or trailing spaces as they can cause false positives.
+      $visibility_paths = trim($entity->get('field_alert_visibility_pages')->value);
+      $entity->field_alert_visibility_pages->value = $visibility_paths;
+
+      // Convert path to lowercase. This allows comparison of the same path.
+      // with different case. Ex: /Page, /page, /PAGE.
+      $visibility_paths = mb_strtolower($visibility_paths);
+      $pages = preg_split("(\r\n?|\n)", $visibility_paths);
+
       $path_matcher = \Drupal::service('path_alias.manager');
       $cacheTags = [];
-      foreach ($visibility_paths as $visibility_path) {
-        $canonical_path = $path_matcher->getPathByAlias($visibility_path['value']);
+      foreach ($pages as $page) {
+        $canonical_path = $path_matcher->getPathByAlias($page);
         // Check if this path is a node path.
         if (strpos($canonical_path, 'node') !== FALSE) {
           $nid = explode('/', $canonical_path)[2];
           $cacheTags[] = 'node:' . $nid;
-
         }
       }
     }
