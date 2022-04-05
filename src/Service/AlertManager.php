@@ -262,7 +262,7 @@ class AlertManager {
       $state = $alert->get('field_alert_visibility_state')->value;
     }
 
-    $visibility_paths = mb_strtolower($visibility_paths);
+    $visibility_paths = $visibility_paths ? mb_strtolower($visibility_paths) : $visibility_paths;
     $pages = preg_split("(\r\n?|\n)", $visibility_paths);
 
     if (empty($visibility_paths) || empty($pages)) {
@@ -273,7 +273,7 @@ class AlertManager {
     // with different case. Ex: /Page, /page, /PAGE.
     // Compare the lowercase path alias (if any) and internal path.
     $current_path = $this->aliasManager->getAliasByPath('/node/'.$node->id());
-    $current_path = mb_strtolower($current_path);
+    $current_path = $current_path ? mb_strtolower($current_path) : $current_path;
     // Check all values from the field "alert_visibility_pages".
     foreach ($pages as $page) {
       $page_path = $page === '<front>' ? '/' : '/' . ltrim($page, '/');
