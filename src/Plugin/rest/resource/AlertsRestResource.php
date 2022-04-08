@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 
 /**
@@ -197,7 +198,7 @@ class AlertsRestResource extends ResourceBase {
     $uri = $this->request->query->get('uri');
     $result = $this->router->match($uri);
     if (!isset($result['node'])) {
-      throw new \HttpException('Node not found');
+      throw new HttpException(400, 'Node not found');
     }
     [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node']);
 
