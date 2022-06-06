@@ -123,8 +123,10 @@ class AlertManager {
     // Get alerts without location assigned.
     $query = $this->nodeStorage->getQuery()
       ->condition('type', 'alert')
-      ->condition('status', 1)
-      ->notExists('field_alert_location');
+      ->condition('status', 1);
+    if (\Drupal::database()->schema()->tableExists('node__field_alert_location')) {
+      $query->notExists('field_alert_location');
+    }
     $alerts = $query->execute();
 
     // Get alerts from services.
