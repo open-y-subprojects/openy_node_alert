@@ -254,12 +254,18 @@ class AlertManager {
   private function checkVisibility(NodeInterface $alert, NodeInterface $node) {
     $visibility_paths = '';
     if ($alert->hasField('field_alert_visibility_pages')) {
-      $visibility_paths = $alert->get('field_alert_visibility_pages')->value;
+      $field = $alert->get('field_alert_visibility_pages');
+      if (!$field->isEmpty()) {
+        $visibility_paths = $field->getString();
+      }
     }
 
     $state = 'include';
     if ($alert->hasField('field_alert_visibility_state')) {
-      $state = $alert->get('field_alert_visibility_state')->value;
+      $field = $alert->get('field_alert_visibility_state');
+      if (!$field->isEmpty()) {
+        $state = $field->getString();
+      }
     }
 
     $visibility_paths = $visibility_paths ? mb_strtolower($visibility_paths) : $visibility_paths;
