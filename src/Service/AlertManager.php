@@ -268,13 +268,14 @@ class AlertManager {
       }
     }
 
-    $visibility_paths = $visibility_paths ? mb_strtolower($visibility_paths) : $visibility_paths;
-    $pages = preg_split("(\r\n?|\n)", $visibility_paths);
-
-    if (empty($visibility_paths) || empty($pages)) {
+    if (empty($visibility_paths)) {
       // Global alert.
       return TRUE;
     }
+
+    $visibility_paths = mb_strtolower($visibility_paths);
+    $pages = preg_split("(\r\n?|\n)", $visibility_paths);
+
     // Convert path to lowercase. This allows comparison of the same path.
     // with different case. Ex: /Page, /page, /PAGE.
     // Compare the lowercase path alias (if any) and internal path.
