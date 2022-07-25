@@ -365,3 +365,26 @@ function openy_node_alert_update_8016() {
     }
   }
 }
+
+/**
+ * Fix visibility pages and state help text for alerts.
+ */
+function openy_node_alert_update_8017() {
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+
+  $configs = [
+    'field.field.node.alert.field_alert_visibility_pages' => [
+      'description'
+    ],
+    'field.field.node.alert.field_alert_visibility_state' => [
+      'description'
+    ]
+  ];
+  $config_updater = \Drupal::service('openy_upgrade_tool.param_updater');
+  foreach ($configs as $config_name => $params) {
+    $config = $config_dir . $config_name . '.yml';
+    foreach ($params as $param) {
+      $config_updater->update($config, $config_name, $param);
+    }
+  }
+}
