@@ -283,7 +283,7 @@ class AlertManager {
     $current_path = $current_path ? mb_strtolower($current_path) : $current_path;
     // Check all values from the field "alert_visibility_pages".
     foreach ($pages as $page) {
-      $page_path = $page === '<front>' ? '/' : '/' . ltrim($page, '/');
+      $page_path = ($page === '<front>' || $page === '/') ? '<front>' : '/' . ltrim($page, '/');
       $is_path_match = $this->pathMatcher->matchPath($current_path, $page_path);
       if ($is_path_match) {
         // If this path matches at least one of the visibility pages,
