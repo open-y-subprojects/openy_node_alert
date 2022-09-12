@@ -61,6 +61,13 @@ class AlertManager {
   protected $pathMatcher;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * Constructs the Alert manager.
    *
    * @param EntityTypeManagerInterface $entity_type_manager
@@ -69,12 +76,14 @@ class AlertManager {
     EntityTypeManagerInterface $entity_type_manager,
     AccountProxyInterface $current_user,
     AliasManagerInterface $alias_manager,
-    PathMatcherInterface $path_matcher
+    PathMatcherInterface $path_matcher,
+    Connection $database
   ) {
     $this->nodeStorage = $entity_type_manager->getStorage('node');
     $this->currentUser = $current_user;
     $this->aliasManager = $alias_manager;
     $this->pathMatcher = $path_matcher;
+    $this->database = $database;
   }
 
   /**
@@ -123,8 +132,10 @@ class AlertManager {
     // Get alerts without location assigned.
     $query = $this->nodeStorage->getQuery()
       ->condition('type', 'alert')
-      ->condition('status', 1)
-      ->notExists('field_alert_location');
+      ->condition('status', 1);
+    if ($this->database->schema()->tableExists('node__field_alert_location')) {
+      $query->notExists('field_alert_location');
+    }
     $alerts = $query->execute();
 
     // Get alerts from services.
