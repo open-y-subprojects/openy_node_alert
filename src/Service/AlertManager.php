@@ -2,6 +2,7 @@
 
 namespace Drupal\openy_node_alert\Service;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Path\PathMatcherInterface;
