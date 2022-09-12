@@ -197,7 +197,7 @@ class AlertsRestResource extends ResourceBase {
     $uri = $this->request->query->get('uri');
     $result = $this->router->match($uri);
     if (!isset($result['node'])) {
-      throw new \HttpException('Node not found');
+      return new ModifiedResourceResponse('Node not found');
     }
     [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node']);
 
