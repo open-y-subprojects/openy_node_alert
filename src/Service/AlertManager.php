@@ -2,7 +2,7 @@
 
 namespace Drupal\openy_node_alert\Service;
 
-use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Path\PathMatcherInterface;
@@ -66,7 +66,7 @@ class AlertManager {
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $database;
+  protected $connection;
 
   /**
    * Constructs the Alert manager.
@@ -77,14 +77,13 @@ class AlertManager {
     EntityTypeManagerInterface $entity_type_manager,
     AccountProxyInterface $current_user,
     AliasManagerInterface $alias_manager,
-    PathMatcherInterface $path_matcher,
-    Connection $database
+    PathMatcherInterface $path_matcher
   ) {
     $this->nodeStorage = $entity_type_manager->getStorage('node');
     $this->currentUser = $current_user;
     $this->aliasManager = $alias_manager;
     $this->pathMatcher = $path_matcher;
-    $this->database = $database;
+    $this->connection = Database::getConnection();
   }
 
   /**
@@ -134,7 +133,7 @@ class AlertManager {
     $query = $this->nodeStorage->getQuery()
       ->condition('type', 'alert')
       ->condition('status', 1);
-    if ($this->database->schema()->tableExists('node__field_alert_location')) {
+    if ($this->connection->schema()->tableExists('node__field_alert_location')) {
       $query->notExists('field_alert_location');
     }
     $alerts = $query->execute();
@@ -158,7 +157,7 @@ class AlertManager {
    */
   public function getAlerts(EntityInterface $node) {
     // Get data from draggableviews_structure table.
-    $query = \Drupal::database()->select('draggableviews_structure', 'dvs');
+    $query = $this->connection->select('draggableviews_structure', 'dvs');
     $query->fields('dvs', ['view_name', 'view_display', 'entity_id', 'weight']);
     $query->condition('dvs.view_name', 'alerts_rearrange');
     $query->condition('dvs.view_display', 'page_1');
