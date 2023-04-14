@@ -3,7 +3,8 @@
   "description": "Alerts application for Open Y distrubution.",
   "type": "drupal-module",
   "require": {
-    "ymcatwincities/openy": "*"
+    "ycloudyusa/yusaopeny": "*",
+    "drupal/ctools": ">=3.13"
   },
   "license": "GPL-2.0+",
   "minimum-stability": "dev"
