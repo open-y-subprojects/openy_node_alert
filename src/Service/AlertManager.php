@@ -130,7 +130,7 @@ class AlertManager {
       $this->alertsSorted = $this->sortAlerts();
     }
     // Get alerts without location assigned.
-    $query = $this->nodeStorage->getQuery()
+    $query = $this->nodeStorage->getQuery()->accessCheck(FALSE)
       ->condition('type', 'alert')
       ->condition('status', 1);
     if ($this->connection->schema()->tableExists('node__field_alert_location')) {
