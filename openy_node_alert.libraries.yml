@@ -6,6 +6,7 @@ alert:
   css:
     component:
       js/openy-alerts/build/main.css: {preprocess: false}
+      css/openy_node_alert.css: {preprocess: false}
   dependencies:
     - core/drupal
     - core/jquery

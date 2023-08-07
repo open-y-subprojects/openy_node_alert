@@ -37,6 +37,7 @@ class App extends Component {
       dots: false,
       infinite: false,
       speed: 500,
+      adaptiveHeight: true,
       slidesToShow: 1,
       slidesToScroll: 1,
       arrows: false,

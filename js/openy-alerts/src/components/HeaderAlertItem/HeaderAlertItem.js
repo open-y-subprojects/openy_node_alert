@@ -12,9 +12,57 @@ import { faTimes, faExclamationCircle, faCircle } from '@fortawesome/free-solid-
 class AlertItem extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isMobile: false,
+      largeDescription: false,
+      expanded: false,
+    };
   }
 
+  componentDidMount(){
+    let description = [];
+    let length = 0;
+    description = description.concat(parse(this.props.description));
+    description.forEach( el => {
+      if(el.props) {
+        length += el.props.children.length;
+      }
+    });
+    this.setState({
+      largeDescription: length > 150
+    });
+    this.showInMobile();
+    window.addEventListener('resize', this.showInMobile.bind(this));
+  };
+
+  showInMobile() {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    // Used for updating indents for main region.
+    if(this.state.isMobile !== mediaQuery.matches) {
+      this.setState({
+        isMobile: mediaQuery.matches,
+      });
+    }
+  }
+
+  toggleExpand = (e) => {
+    this.setState({ expanded: !this.state.expanded});
+    window.dispatchEvent( new Event('resize'));
+    setTimeout(() => { this.focusItem(); }, 100);
+  };
+
+  focusItem = () => {
+    this.props.focus(parseInt(this.props.index));
+    let slicks = document.getElementsByClassName("slick-list");
+    for (let slick of slicks) {
+      slick.scrollLeft = 0;
+      // Additionally reset horizontal scroll for screen readers.
+      setTimeout(() => { slick.scrollLeft = 0; }, 100);
+    }
+  };
   render() {
+    const { isMobile, expanded, largeDescription } = this.state;
+    const expandClass = !expanded && isMobile && largeDescription ? ' alert-short hidden' : ' alert-full';
     let iconStyle = {
       color: this.props.iconColor ? `#${this.props.iconColor}` : 'blue'
     };
@@ -26,20 +74,10 @@ class AlertItem extends Component {
       } else {
         ad = [parseInt(this.props.alertId)];
       }
-      cookie.save('alerts_dismiss', ad);
+      cookie.save('alerts_dismiss', ad, {path: '/'});
       this.props.closeAlert(parseInt(this.props.alertId));
       if (this.props.index === this.props.slider.props.children[0].length - 1) {
         setTimeout(() => (this.props.slider.slickPrev()), this.props.slider.props.speed);
-      }
-    };
-
-    let focusItem = () => {
-      this.props.focus(parseInt(this.props.index));
-      let slicks = document.getElementsByClassName("slick-list");
-      for (let slick of slicks) {
-        slick.scrollLeft = 0;
-        // Additionally reset horizontal scroll for screen readers.
-        setTimeout(() => { slick.scrollLeft = 0; }, 100);
       }
     };
 
@@ -63,7 +101,7 @@ class AlertItem extends Component {
           className={`alert${this.props.alertId}`}
           tabindex="0"
           data-idx={this.props.index}
-          onFocus={() => focusItem()}
+          onFocus={() => this.focusItem()}
         >
           <div className="container header-alert">
             <div className="row site-alert__wrapper">
@@ -79,12 +117,12 @@ class AlertItem extends Component {
                 <div className="site-alert__title">
                   {parse(this.props.label)}
                 </div>
-                <div className="site-alert__content header-alert__content">
+                <div className={"site-alert__content header-alert__content" + expandClass}>
                   {parse(this.props.description)}
                 </div>
               </div>
               {this.props.linkTitle && (
-                <div className="col-xs-12 col-sm-5 col-md-5 col-lg-5 site-alert__cta">
+                <div className={"col-xs-12 col-sm-5 col-md-5 col-lg-5 site-alert__cta"  + expandClass}>
                   <div className="field-alert-link">
                     <a href={this.props.linkUrl} style={linkStyle}>
                       {this.props.linkTitle}
@@ -92,13 +130,25 @@ class AlertItem extends Component {
                   </div>
                 </div>
               )}
-
+              {isMobile && largeDescription &&
+                <div className="site-alert__content expand__wrapp d-flex justify-content-center p-2">
+                  <button
+                    className={"btn expand__button " + (expanded ? 'expanded' : '')}
+                    onClick={this.toggleExpand.bind(this)}
+                    title={expanded ? "Show less" : "Show more"}
+                    style={{
+                      color: this.props.txtColor ? `#${this.props.txtColor}` : 'white',
+                    }}
+                  >
+                  </button>
+                </div>
+              }
               <a
                 href="#close"
                 className="site-alert__dismiss"
                 onClick={() => closeItem()}
                 aria-label="Close alert"
-                onFocus={() => focusItem()}
+                onFocus={() => this.focusItem()}
               >
                 <span className="visually-hidden">
                   Close alert {parse(this.props.label)}
