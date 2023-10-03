@@ -369,9 +369,9 @@ display:
         - user.permissions
       tags:
         - 'config:field.storage.node.field_alert_place'
-  page_1:
+  list:
     display_plugin: page
-    id: page_1
+    id: list
     display_title: 'Alerts Rearrange'
     position: 1
     display_options:

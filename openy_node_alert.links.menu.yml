@@ -1,0 +1,5 @@
+openy_node_alert.alerts_rearrange:
+  title: 'Alerts Rearrange'
+  route_name: view.alerts_rearrange.list
+  parent: system.admin_content
+  weight: 0

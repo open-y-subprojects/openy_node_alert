@@ -5,10 +5,9 @@
  * Open Y Node Alert install file.
  */
 
+use \Drupal\menu_link_content\Entity\MenuLinkContent;
 use \Drupal\user\Entity\Role;
 use \Drupal\user\RoleInterface;
-use \Drupal\Component\Utility\Unicode;
-use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_install().
@@ -387,4 +386,17 @@ function openy_node_alert_update_8017() {
       $config_updater->update($config, $config_name, $param);
     }
   }
+}
+
+/**
+ * Update Rearranging Alerts views configuration.
+ */
+function openy_node_alert_update_8018() {
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+  $configs = [
+    'views.view.alerts_rearrange',
+  ];
+  $config_importer = \Drupal::service('openy_upgrade_tool.importer');
+  $config_importer->setDirectory($config_dir);
+  $config_importer->importConfigs($configs);
 }
