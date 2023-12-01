@@ -160,7 +160,7 @@ class AlertManager {
     $query = $this->connection->select('draggableviews_structure', 'dvs');
     $query->fields('dvs', ['view_name', 'view_display', 'entity_id', 'weight']);
     $query->condition('dvs.view_name', 'alerts_rearrange');
-    $query->condition('dvs.view_display', 'page_1');
+    $query->condition('dvs.view_display', 'list');
     $query->orderBy('dvs.weight');
     $weights = $query->execute()->fetchAll();
     $loadByProperties = ['type' => 'alert', 'status' => 1];
