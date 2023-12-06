@@ -9,7 +9,7 @@
   .expand__wrapp {
     width: 100%;
 
-    .expand__button {
+    .btn.expand__button {
 
       &.expanded {
         &:after {
@@ -21,7 +21,7 @@
         display: block;
         width: 20px;
         height: 20px;
-        background: url("../assets/img/arrow.svg");
+        background: url("data:image/svg+xml;base64,PHN2ZyAgZmlsbD0id2hpdGUiIGlkPSJfMS1BcnJvd19VcCIgZGF0YS1uYW1lPSIxLUFycm93IFVwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHRpdGxlPjEtQXJyb3cgVXA8L3RpdGxlPjxwYXRoIGQ9Ik0yNi43MSwxMC4yOWwtMTAtMTBhMSwxLDAsMCwwLTEuNDEsMGwtMTAsMTAsMS40MSwxLjQxTDE1LDMuNDFWMzJoMlYzLjQxbDguMjksOC4yOVoiLz48L3N2Zz4K");
         transform: rotate(180deg);
       }
     }
