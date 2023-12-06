@@ -1,5 +1,5 @@
 alert:
-  version: 1.2
+  version: 1.3
   js:
     js/openy-alerts/build/main.js: {preprocess: false}
     js/openy_node_alert.js: {preprocess: false}
