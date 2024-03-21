@@ -224,7 +224,8 @@ class AlertsRestResource extends ResourceBase {
     if ($language && !$request_language || $request_language && $request_language->getId() != $alert_language) {
       // Redirect to the same request URL with the language code added after the basePath.
       $redirectUrl = $this->request->getSchemeAndHttpHost() . '/' . $langcode . $this->request->getRequestUri();
-      $response = new ModifiedResourceResponse(NULL, 303); // 303 See Other
+      // Sets the HTTP Status code to 303 - See Other.
+      $response = new ModifiedResourceResponse(NULL, 303);
       $response->headers->set('Location', $redirectUrl);
       return $response;
     }
