@@ -195,7 +195,7 @@ class AlertsRestResource extends ResourceBase {
     }
 
     $uri = $this->request->query->get('uri');
-    $result = $this->router->match($uri);
+    $result = $this->router->match("/fr" . $uri);
     if (!isset($result['node'])) {
       return new ModifiedResourceResponse('Node not found');
     }
