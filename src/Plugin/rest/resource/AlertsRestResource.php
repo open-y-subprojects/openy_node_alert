@@ -4,6 +4,7 @@ namespace Drupal\openy_node_alert\Plugin\rest\resource;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\openy_node_alert\Service\AlertManager;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
@@ -94,6 +95,13 @@ class AlertsRestResource extends ResourceBase {
   protected $alertManager;
 
   /**
+   * Language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new AlertsRestResource object.
    *
    * @param array $configuration
@@ -124,6 +132,8 @@ class AlertsRestResource extends ResourceBase {
    *   The router doing the actual routing.
    * @param AlertManager $alert_manager
    *   The alert manager.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
    */
   public function __construct(
     array $configuration,
@@ -139,7 +149,8 @@ class AlertsRestResource extends ResourceBase {
     ModuleHandlerInterface $module_handler,
     Request $request,
     RequestMatcherInterface $router,
-    AlertManager $alert_manager
+    AlertManager $alert_manager,
+    LanguageManagerInterface $language_manager
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
 
@@ -152,6 +163,7 @@ class AlertsRestResource extends ResourceBase {
     $this->request = $request;
     $this->router = $router;
     $this->alertManager = $alert_manager;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -172,7 +184,8 @@ class AlertsRestResource extends ResourceBase {
       $container->get('module_handler'),
       $container->get('request_stack')->getCurrentRequest(),
       $container->get('router.no_access_checks'),
-      $container->get('openy_node_alert.alert_manager')
+      $container->get('openy_node_alert.alert_manager'),
+      $container->get('language_manager')
     );
   }
 
@@ -195,11 +208,33 @@ class AlertsRestResource extends ResourceBase {
     }
 
     $uri = $this->request->query->get('uri');
+
+    // Extract the language code from the URI.
+    $langcode = substr($uri, 1, 2);
+    $language = $this->languageManager->getLanguage($langcode);
+    $alert_language = NULL;
+    if ($language) {
+      $alert_language = $language->getId();
+    }
+
+    // Check if the first segment is a valid language code.
+    $request_langcode = substr($this->request->getPathInfo(), 1, 2);
+    $request_language = $this->languageManager->getLanguage($request_langcode);
+
+    if ($language && !$request_language || $request_language && $request_language->getId() != $alert_language) {
+      // Redirect to the same request URL with the language code added after the basePath.
+      $redirectUrl = $this->request->getSchemeAndHttpHost() . '/' . $langcode . $this->request->getRequestUri();
+      $response = new ModifiedResourceResponse(NULL, 303); // 303 See Other
+      $response->headers->set('Location', $redirectUrl);
+      return $response;
+    }
+
     $result = $this->router->match($uri);
     if (!isset($result['node'])) {
       return new ModifiedResourceResponse('Node not found');
     }
-    [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node']);
+
+    [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node'], $alert_language);
 
     $this->moduleHandler->alter('openy_node_alert_get', $sendAlerts, $alerts);
 
