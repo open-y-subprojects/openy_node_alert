@@ -77,7 +77,7 @@ class AlertManager {
     EntityTypeManagerInterface $entity_type_manager,
     AccountProxyInterface $current_user,
     AliasManagerInterface $alias_manager,
-    PathMatcherInterface $path_matcher
+    PathMatcherInterface $path_matcher,
   ) {
     $this->nodeStorage = $entity_type_manager->getStorage('node');
     $this->currentUser = $current_user;
@@ -155,7 +155,7 @@ class AlertManager {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @throws \HttpException
    */
-  public function getAlerts(EntityInterface $node) {
+  public function getAlerts(EntityInterface $node, string|null $language = NULL) {
     // Get data from draggableviews_structure table.
     $query = $this->connection->select('draggableviews_structure', 'dvs');
     $query->fields('dvs', ['view_name', 'view_display', 'entity_id', 'weight']);
@@ -192,6 +192,15 @@ class AlertManager {
       if (!empty($service_alert_ids) && !in_array($alert->id(), $service_alert_ids)) {
         continue;
       }
+
+      // Load the translation content.
+      if ($language) {
+        $available_translations = array_keys($alert->getTranslationLanguages());
+        if (in_array($language, $available_translations)) {
+          $alert = $alert->getTranslation($language);
+        }
+      }
+
       if (!$alert->hasField('field_alert_visibility_pages')) {
         if ($alert->hasField('field_alert_belongs') && !$alert->field_alert_belongs->isEmpty() && !$alert->field_alert_place->isEmpty()) {
           $refid = $alert->field_alert_belongs->target_id;
