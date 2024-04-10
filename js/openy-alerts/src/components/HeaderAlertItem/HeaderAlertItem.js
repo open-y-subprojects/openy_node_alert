@@ -25,7 +25,18 @@ class AlertItem extends Component {
     description = description.concat(parse(this.props.description));
     description.forEach( el => {
       if(el.props) {
-        length += el.props.children.length;
+        // If the description has markup, we need to count each element.
+        if(el.props.children instanceof Object) {
+          el.props.children.forEach( el => {
+            // If the element has markup it's an object.
+            if(el instanceof Object){
+              length += el.props.children.length;
+            }
+            // If not an object we just get the length.
+            else length += el.length;
+          })
+        }
+        else length += el.props.children.length;
       }
     });
     this.setState({
