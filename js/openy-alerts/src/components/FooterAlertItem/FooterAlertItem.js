@@ -20,25 +20,13 @@ class AlertItem extends Component {
   }
 
   componentDidMount(){
-    let description = [];
-    let length = 0;
-    description = description.concat(parse(this.props.description));
-    description.forEach( el => {
-      if(el.props) {
-        // If the description has markup, we need to count each element.
-        if(el.props.children instanceof Object) {
-          el.props.children.forEach( el => {
-            // If the element has markup it's an object.
-            if(el instanceof Object){
-              length += el.props.children.length;
-            }
-            // If not an object we just get the length.
-            else length += el.length;
-          })
-        }
-        else length += el.props.children.length;
-      }
-    });
+    const stripHTML = (html) => {
+      let doc = new DOMParser().parseFromString(html, 'text/html');
+      return doc.body.textContent || "";
+    };
+
+    const textContent = stripHTML(this.props.description);
+    const length = textContent.length;
 
     this.setState({
       largeDescription: length > 150
