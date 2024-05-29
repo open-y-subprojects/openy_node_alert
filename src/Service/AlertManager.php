@@ -2,6 +2,7 @@
 
 namespace Drupal\openy_node_alert\Service;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -69,6 +70,13 @@ class AlertManager {
   protected $connection;
 
   /**
+   * The alias of the homepage.
+   *
+   * @var string
+   */
+  protected $homePageAlias;
+
+  /**
    * Constructs the Alert manager.
    *
    * @param EntityTypeManagerInterface $entity_type_manager
@@ -78,12 +86,15 @@ class AlertManager {
     AccountProxyInterface $current_user,
     AliasManagerInterface $alias_manager,
     PathMatcherInterface $path_matcher,
+    ConfigFactoryInterface $config_factory
   ) {
     $this->nodeStorage = $entity_type_manager->getStorage('node');
     $this->currentUser = $current_user;
     $this->aliasManager = $alias_manager;
     $this->pathMatcher = $path_matcher;
     $this->connection = Database::getConnection();
+    $page_front = $config_factory->get('system.site')->get('page.front');
+    $this->homePageAlias = $alias_manager->getAliasByPath($page_front);
   }
 
   /**
@@ -303,7 +314,7 @@ class AlertManager {
     $current_path = $current_path ? mb_strtolower($current_path) : $current_path;
     // Check all values from the field "alert_visibility_pages".
     foreach ($pages as $page) {
-      $page_path = ($page === '<front>' || $page === '/') ? '<front>' : '/' . ltrim($page, '/');
+      $page_path = ($page === '<front>' || $page === '/') ? $this->homePageAlias : '/' . ltrim($page, '/');
       $is_path_match = $this->pathMatcher->matchPath($current_path, $page_path);
       if ($is_path_match) {
         // If this path matches at least one of the visibility pages,
