@@ -9,9 +9,9 @@ id: node.alert.field_alert_color
 field_name: field_alert_color
 entity_type: node
 bundle: alert
-label: 'Background color'
+label: 'Background color (deprecated)'
 description: 'Reference field for choosing the term from "Color" vocabulary.'
-required: true
+required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''

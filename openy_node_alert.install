@@ -5,7 +5,6 @@
  * Open Y Node Alert install file.
  */
 
-use \Drupal\menu_link_content\Entity\MenuLinkContent;
 use \Drupal\user\Entity\Role;
 use \Drupal\user\RoleInterface;
 
@@ -399,4 +398,95 @@ function openy_node_alert_update_8018() {
   $config_importer = \Drupal::service('openy_upgrade_tool.importer');
   $config_importer->setDirectory($config_dir);
   $config_importer->importConfigs($configs);
+}
+
+/**
+ * Add a new field for CT Class to store a type of class.
+ */
+function openy_node_alert_update_91001(&$sandbox) {
+  _openy_node_alert_mark_old_fields_deprecated();
+  _openy_node_alert_mark_add_new_alert_style_field();
+  _openy_node_alert_update_existing_alerts($sandbox);
+}
+
+/**
+ * Mark the bg-color, text-color, and icon-color fields deprecated.
+ */
+function _openy_node_alert_mark_old_fields_deprecated() {
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+
+  $configs = [
+    'field.field.node.alert.field_alert_color' => [
+      'label',
+      'required',
+    ],
+    'field.field.node.alert.field_alert_icon_color' => [
+      'label',
+      'required',
+    ],
+    'field.field.node.alert.field_alert_text_color' => [
+      'label',
+      'required',
+    ]
+  ];
+  $config_updater = \Drupal::service('openy_upgrade_tool.param_updater');
+  foreach ($configs as $config_name => $params) {
+    $config = $config_dir . $config_name . '.yml';
+    foreach ($params as $param) {
+      $config_updater->update($config, $config_name, $param);
+    }
+  }
+}
+
+/**
+ *  Add new field Alert Style for the CT Alert.
+ */
+function _openy_node_alert_mark_add_new_alert_style_field() {
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+  $configs = [
+    'field.storage.node.field_alert_style',
+    'field.field.node.alert.field_alert_style',
+    'core.entity_form_display.node.alert.default',
+  ];
+  $config_importer = \Drupal::service('openy_upgrade_tool.importer');
+  $config_importer->setDirectory($config_dir);
+  $config_importer->importConfigs($configs);
+}
+
+/**
+ * Set a value of a new field Alert Style to 'deprecated' for existing nodes.
+ */
+function _openy_node_alert_update_existing_alerts(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current'] = 0;
+    $sandbox['max'] = \Drupal::entityQuery('node')
+      ->condition('type', 'alert')
+      ->count()
+      ->accessCheck()
+      ->execute();
+  }
+  // Load Alert entity in chunks of 20 entities.
+  $ids = \Drupal::entityQuery('node')
+    ->condition('type', 'alert')
+    ->condition('nid', $sandbox['current'], '>')
+    ->range(0, 20)
+    ->sort('nid')
+    ->accessCheck()
+    ->execute();
+  $nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($ids);
+
+  foreach ($nodes as $node) {
+    if (!$node->hasField('field_alert_style')
+      && !$node->get('field_alert_style')->isEmpty()) {
+      continue;
+    }
+    $node->set('field_alert_style', 'deprecated');
+    $node->save();
+    $sandbox['progress']++;
+    $sandbox['current'] = $node->id();
+  }
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t(' @count Alert nodes were updated', ['@count' => $sandbox['max']]);
 }

@@ -263,12 +263,13 @@ class AlertManager {
 
     return [
       'title' => $alert->getTitle(),
-      'textColor' => $alert->field_alert_text_color->entity->field_color->value,
-      'bgColor' => $alert->field_alert_color->entity->field_color->value,
-      'description' => $alert->field_alert_description->value,
+      'textColor' => $alert?->field_alert_text_color?->entity?->field_color?->value,
+      'bgColor' => $alert?->field_alert_color?->entity?->field_color?->value,
+      'alertStyle' => $alert?->field_alert_style?->value,
+      'description' => $alert?->field_alert_description?->value,
       'iconColor' => $iconColor,
       'linkUrl' => $url,
-      'linkText' => $alert->field_alert_link->title,
+      'linkText' => $alert?->field_alert_link?->title,
       'id' => $alert->id(),
     ];
   }

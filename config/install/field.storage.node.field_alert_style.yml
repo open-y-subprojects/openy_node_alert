@@ -1,0 +1,36 @@
+uuid: cfc38617-a553-47f5-aabd-543662541dd6
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_alert_style
+field_name: field_alert_style
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: deprecated
+      label: 'Old Deprecated way'
+    -
+      value: ws-alert-critical
+      label: 'Urgent - Critical'
+    -
+      value: ws-alert-warning
+      label: 'Urgent - Warning'
+    -
+      value: ws-alert-info
+      label: 'Urgent - Info'
+    -
+      value: ws-alert-dark
+      label: 'Urgent - Dark'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

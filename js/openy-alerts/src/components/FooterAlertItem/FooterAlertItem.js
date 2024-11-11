@@ -64,9 +64,6 @@ class AlertItem extends Component {
   render() {
     const { isMobile, expanded, largeDescription } = this.state;
     const expandClass = !expanded && isMobile && largeDescription ? ' alert-short hidden' : ' alert-full';
-    let iconStyle = {
-      color: this.props.iconColor ? `#${this.props.iconColor}` : 'blue'
-    };
 
     let closeItem = () => {
       let ad = cookie.load('alerts_dismiss');
@@ -82,14 +79,29 @@ class AlertItem extends Component {
       }
     };
 
+    let alertStyle = '';
+    let iconStyle = {
+      backgroundColor: this.props.iconColor ? `#${this.props.iconColor}` : 'blue'
+    };
     let linkStyle = {
       color: this.props.txtColor ? `#${this.props.txtColor}` : 'white',
       borderColor: this.props.txtColor ? `#${this.props.txtColor}` : 'white'
     };
-    let alertStyle = {
-      backgroundColor: this.props.bgColor ? `#${this.props.bgColor}` : 'blue',
-      color: this.props.txtColor ? `#${this.props.txtColor}` : 'white'
-    };
+
+    let alertStyleClass = this.props.alertStyle ? this.props.alertStyle : 'deprecated';
+    let isDeprecated = alertStyleClass === 'deprecated';
+    if (isDeprecated) {
+      alertStyle = {
+        backgroundColor: this.props.bgColor ? `#${this.props.bgColor}` : 'blue',
+        color: this.props.txtColor ? `#${this.props.txtColor}` : 'white'
+      };
+      iconStyle = {
+        color: this.props.iconColor ? `#${this.props.iconColor}` : 'blue'
+      };
+    }
+
+    let alertClassName = 'alert' + this.props.alertId + ' alert-item ' + alertStyleClass;
+
     let alertContentClasses = this.props.linkTitle ?
       "col-xs-12 col-sm-6 col-md-6 col-lg-6" :
       "col-xs-12 col-sm-11 col-md-11 col-lg-11";
@@ -98,24 +110,29 @@ class AlertItem extends Component {
         <div
           role="article"
           data-nid={this.props.alertId}
-          style={alertStyle}
-          className={`alert${this.props.alertId}`}
+          style= {alertStyle}
+          className={alertClassName}
           tabindex="0"
           data-idx={this.props.index}
           onFocus={() => this.focusItem()}
         >
           <div className="container footer-alert">
             <div className="row site-alert__wrapper">
-              {this.props.iconColor && (
-                <div className="site-alert__icon" style={iconStyle}>
-                  <span className="fa-layers fa-fw">
-                    <FontAwesomeIcon icon={faCircle} color="white" />
-                    <FontAwesomeIcon icon={faExclamationCircle} />
-                  </span>
-                </div>
-              )}
               <div className={alertContentClasses}>
                 <div className="site-alert__title">
+                  {this.props.iconColor && (
+                    <div className="site-alert__icon">
+                      {isDeprecated &&
+                        <span className="fa-layers fa-fw" style={iconStyle}>
+                      <FontAwesomeIcon icon={faCircle} color="white"/>
+                      <FontAwesomeIcon icon={faExclamationCircle}/>
+                    </span>
+                      }
+                      {!isDeprecated &&
+                        <span class="alert-icon"></span>
+                      }
+                    </div>
+                  )}
                   {parse(this.props.label)}
                 </div>
                 <div className={"site-alert__content footer-alert__content" + expandClass}>
@@ -132,7 +149,7 @@ class AlertItem extends Component {
                 </div>
               )}
               {isMobile && largeDescription &&
-                <div className="site-alert__content expand__wrapp d-flex justify-content-center p-2">
+                <div className="site-alert__content expand__wrapp justify-content-center p-2">
                   <button
                     className={"btn expand__button " + (expanded ? 'expanded' : '')}
                     onClick={this.toggleExpand.bind(this)}

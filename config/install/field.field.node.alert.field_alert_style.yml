@@ -1,0 +1,21 @@
+uuid: 18fcda56-64aa-483a-941c-083b53447022
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_alert_style
+    - node.type.alert
+  module:
+    - options
+id: node.alert.field_alert_style
+field_name: field_alert_style
+entity_type: node
+bundle: alert
+label: 'Alert Style'
+description: 'Please select the desired style of the alert.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string
