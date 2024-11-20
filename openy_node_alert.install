@@ -5,6 +5,7 @@
  * Open Y Node Alert install file.
  */
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use \Drupal\user\Entity\Role;
 use \Drupal\user\RoleInterface;
 
@@ -403,29 +404,27 @@ function openy_node_alert_update_8018() {
 /**
  * Add a new field for CT Class to store a type of class.
  */
-function openy_node_alert_update_91001(&$sandbox) {
-  _openy_node_alert_mark_old_fields_deprecated();
-  _openy_node_alert_mark_add_new_alert_style_field();
+function openy_node_alert_update_91001(&$sandbox): void {
+  _openy_node_alert_mark_old_fields_not_required();
+  _openy_node_alert_add_new_alert_style_field();
   _openy_node_alert_update_existing_alerts($sandbox);
 }
 
 /**
- * Mark the bg-color, text-color, and icon-color fields deprecated.
+ * Mark the bg-color, text-color, and icon-color fields not required.
  */
-function _openy_node_alert_mark_old_fields_deprecated() {
-  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+function _openy_node_alert_mark_old_fields_not_required(): void {
+  $config_dir = \Drupal::service('extension.list.module')
+      ->getPath('openy_node_alert') . '/config/install/';
 
   $configs = [
     'field.field.node.alert.field_alert_color' => [
-      'label',
       'required',
     ],
     'field.field.node.alert.field_alert_icon_color' => [
-      'label',
       'required',
     ],
     'field.field.node.alert.field_alert_text_color' => [
-      'label',
       'required',
     ]
   ];
@@ -441,7 +440,7 @@ function _openy_node_alert_mark_old_fields_deprecated() {
 /**
  *  Add new field Alert Style for the CT Alert.
  */
-function _openy_node_alert_mark_add_new_alert_style_field() {
+function _openy_node_alert_add_new_alert_style_field(): void {
   $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
   $configs = [
     'field.storage.node.field_alert_style',
@@ -454,9 +453,9 @@ function _openy_node_alert_mark_add_new_alert_style_field() {
 }
 
 /**
- * Set a value of a new field Alert Style to 'deprecated' for existing nodes.
+ * Set a value of a new field Alert Style to 'classic' for existing nodes.
  */
-function _openy_node_alert_update_existing_alerts(&$sandbox) {
+function _openy_node_alert_update_existing_alerts(&$sandbox): TranslatableMarkup {
   if (!isset($sandbox['progress'])) {
     $sandbox['progress'] = 0;
     $sandbox['current'] = 0;
@@ -481,7 +480,7 @@ function _openy_node_alert_update_existing_alerts(&$sandbox) {
       && !$node->get('field_alert_style')->isEmpty()) {
       continue;
     }
-    $node->set('field_alert_style', 'deprecated');
+    $node->set('field_alert_style', 'classic');
     $node->save();
     $sandbox['progress']++;
     $sandbox['current'] = $node->id();

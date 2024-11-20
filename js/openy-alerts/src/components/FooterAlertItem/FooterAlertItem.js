@@ -88,9 +88,9 @@ class AlertItem extends Component {
       borderColor: this.props.txtColor ? `#${this.props.txtColor}` : 'white'
     };
 
-    let alertStyleClass = this.props.alertStyle ? this.props.alertStyle : 'deprecated';
-    let isDeprecated = alertStyleClass === 'deprecated';
-    if (isDeprecated) {
+    let alertStyleClass = this.props.alertStyle ? this.props.alertStyle : 'classic';
+    let isClassic = alertStyleClass === 'classic';
+    if (isClassic) {
       alertStyle = {
         backgroundColor: this.props.bgColor ? `#${this.props.bgColor}` : 'blue',
         color: this.props.txtColor ? `#${this.props.txtColor}` : 'white'
@@ -122,13 +122,13 @@ class AlertItem extends Component {
                 <div className="site-alert__title">
                   {this.props.iconColor && (
                     <div className="site-alert__icon">
-                      {isDeprecated &&
+                      {isClassic &&
                         <span className="fa-layers fa-fw" style={iconStyle}>
                       <FontAwesomeIcon icon={faCircle} color="white"/>
                       <FontAwesomeIcon icon={faExclamationCircle}/>
                     </span>
                       }
-                      {!isDeprecated &&
+                      {!isClassic &&
                         <span class="alert-icon"></span>
                       }
                     </div>

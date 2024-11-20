@@ -12,20 +12,20 @@ type: list_string
 settings:
   allowed_values:
     -
-      value: deprecated
-      label: 'Old Deprecated way'
+      value: classic
+      label: 'Classic'
     -
       value: ws-alert-critical
-      label: 'Urgent - Critical'
+      label: 'Urgent - Red'
     -
       value: ws-alert-warning
-      label: 'Urgent - Warning'
+      label: 'Urgent - Yellow'
     -
       value: ws-alert-info
-      label: 'Urgent - Info'
+      label: 'Urgent - Blue'
     -
       value: ws-alert-dark
-      label: 'Urgent - Dark'
+      label: 'Urgent - Black'
   allowed_values_function: ''
 module: options
 locked: false
