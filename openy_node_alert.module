@@ -83,21 +83,17 @@ function openy_node_alert_entity_presave(EntityInterface $entity) {
  */
 function openy_node_alert_form_node_alert_edit_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   // Show these fields only for the classic style option.
-  $form['field_alert_color']['widget']['#states'] = [
-    'visible' => [
-      ':input[name="field_alert_style"]' => ['value' => 'classic'],
-    ],
+  $fields_to_toggle = [
+    'field_alert_color',
+    'field_alert_text_color',
+    'field_alert_icon_color',
   ];
 
-  $form['field_alert_text_color']['widget']['#states'] = [
-    'visible' => [
-      ':input[name="field_alert_style"]' => ['value' => 'classic'],
-    ],
-  ];
-
-  $form['field_alert_icon_color']['widget']['#states'] = [
-    'visible' => [
-      ':input[name="field_alert_style"]' => ['value' => 'classic'],
-    ],
-  ];
+  foreach ($fields_to_toggle as $field_name) {
+    $form[$field_name]['widget']['#states'] = [
+      'visible' => [
+        ':input[name="field_alert_style"]' => ['value' => 'classic'],
+      ],
+    ];
+  }
 }

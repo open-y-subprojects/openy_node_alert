@@ -416,24 +416,16 @@ function openy_node_alert_update_91001(&$sandbox): void {
 function _openy_node_alert_mark_old_fields_not_required(): void {
   $config_dir = \Drupal::service('extension.list.module')
       ->getPath('openy_node_alert') . '/config/install/';
-
-  $configs = [
-    'field.field.node.alert.field_alert_color' => [
-      'required',
-    ],
-    'field.field.node.alert.field_alert_icon_color' => [
-      'required',
-    ],
-    'field.field.node.alert.field_alert_text_color' => [
-      'required',
-    ]
-  ];
   $config_updater = \Drupal::service('openy_upgrade_tool.param_updater');
-  foreach ($configs as $config_name => $params) {
-    $config = $config_dir . $config_name . '.yml';
-    foreach ($params as $param) {
-      $config_updater->update($config, $config_name, $param);
-    }
+  $configs = [
+    'field.field.node.alert.field_alert_color',
+    'field.field.node.alert.field_alert_icon_color',
+    'field.field.node.alert.field_alert_text_color',
+  ];
+
+  foreach ($configs as $config_name) {
+    $config_file = $config_dir . $config_name . '.yml';
+    $config_updater->update($config_file, $config_name, 'required');
   }
 }
 
