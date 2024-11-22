@@ -70,6 +70,7 @@ class App extends Component {
                   alertId={parseInt(a.id)}
                   label={a.title}
                   iconColor={a.iconColor}
+                  alertStyle={a.alertStyle}
                   linkTitle={a.linkText}
                   linkUrl={a.linkUrl}
                   description={a.description}
