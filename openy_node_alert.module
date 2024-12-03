@@ -81,7 +81,26 @@ function openy_node_alert_entity_presave(EntityInterface $entity) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function openy_node_alert_form_node_alert_edit_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+function openy_node_alert_form_node_alert_edit_form_alter(array &$form, FormStateInterface $form_state, $form_id): void {
+  _openy_node_alert_alter_node_alert_form($form);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function openy_node_alert_form_node_alert_form_alter(array &$form, FormStateInterface $form_state, $form_id): void {
+  _openy_node_alert_alter_node_alert_form($form);
+}
+
+/**
+ * Adds '#states' functionality to the node form.
+ *
+ * @param $form
+ *   An object of the node form.
+ *
+ * @return void
+ */
+function _openy_node_alert_alter_node_alert_form(&$form): void {
   // Show these fields only for the classic style option.
   $fields_to_toggle = [
     'field_alert_color',
