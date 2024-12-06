@@ -15,16 +15,28 @@ settings:
       label: 'Classic'
     -
       value: ws-alert-critical
-      label: 'Urgent - Red'
+      label: 'Urgent - Danger (Red)'
     -
       value: ws-alert-warning
-      label: 'Urgent - Yellow'
+      label: 'Urgent - Warning (Yellow)'
     -
       value: ws-alert-info
-      label: 'Urgent - Blue'
+      label: 'Urgent - Info (Blue)'
     -
       value: ws-alert-dark
-      label: 'Urgent - Black'
+      label: 'Urgent - Dark (Black)'
+    -
+      value: ws-alert-blue
+      label: 'Info - Blue'
+    -
+      value: ws-alert-green
+      label: 'Info - Green'
+    -
+      value: ws-alert-purple
+      label: 'Info - Purple'
+    -
+      value: ws-alert-red
+      label: 'Info - Red'
   allowed_values_function: ''
 module: options
 locked: false
