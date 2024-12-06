@@ -55,13 +55,22 @@
           background: var(--ylb-color-white, white);
         }
 
+        &.ws-alert-critical,
+        &.ws-alert-warning,
+        &.ws-alert-info,
+        &.ws-alert-dark {
+          .site-alert__dismiss {
+            color: currentColor;
+          }
+        }
+
         &.ws-alert-critical {
-          background-color: var(--ylb-color-red, red);
+          background-color: var(--ylb-color-red, #ed1c24);
           color: var(--ylb-color-white, white);
         }
 
         &.ws-alert-warning {
-          background-color: var(--ylb-color-orange-light, orange);
+          background-color: var(--ylb-color-orange-light, #fcaf17);
           color: var(--ylb-color-dark-grey-2, #231f20);
 
           .alert-icon {
@@ -70,7 +79,7 @@
         }
 
         &.ws-alert-info {
-          background-color: var(--ylb-color-blue-light, blue);
+          background-color: var(--ylb-color-blue-light, #00aeef);
           color: var(--ylb-color-dark-grey-2, #231f20);
 
           .alert-icon {
@@ -89,6 +98,48 @@
               border-color: var(--ylb-color-white, white) !important;
             }
           }
+        }
+
+        &.ws-alert-blue,
+        &.ws-alert-green,
+        &.ws-alert-purple,
+        &.ws-alert-red {
+          background-color: var(--ylb-color-light-grey-1, #f2f2f2);
+          border-top: 1px solid currentColor;
+          border-bottom: 1px solid currentColor;
+
+          .site-alert__cta {
+            .field-alert-link a {
+              // These have to be important to override styles in Carnation
+              // openy_carnation/src/scss/modules/site-alerts.scss.
+              background-color: white;
+              color: currentColor !important;
+              border-color: currentColor !important;
+
+              &:hover {
+                border-color: transparent !important;
+              }
+            }
+          }
+          .site-alert__dismiss {
+            color: currentColor;
+          }
+        }
+
+        &.ws-alert-blue {
+          color: var(--ylb-color-blue-dark, #0060af);
+        }
+
+        &.ws-alert-green {
+          color: var(--ylb-color-green-dark, #006b6b);
+        }
+
+        &.ws-alert-purple {
+          color: var(--ylb-color-purple-dark, #5c2e91);
+        }
+
+        &.ws-alert-red {
+          color: var(--ylb-color-red-dark, #a92b31);
         }
 
         .site-alert__wrapper {
