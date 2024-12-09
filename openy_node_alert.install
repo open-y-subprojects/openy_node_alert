@@ -411,6 +411,20 @@ function openy_node_alert_update_91001(&$sandbox): void {
 }
 
 /**
+ * Add additional Alert Style options.
+ */
+function openy_node_alert_update_91002(): void
+{
+  $config_dir = \Drupal::service('extension.list.module')->getPath('openy_node_alert') . '/config/install/';
+  $configs = [
+    'field.storage.node.field_alert_style',
+  ];
+  $config_importer = \Drupal::service('openy_upgrade_tool.importer');
+  $config_importer->setDirectory($config_dir);
+  $config_importer->importConfigs($configs);
+}
+
+/**
  * Mark the bg-color, text-color, and icon-color fields not required.
  */
 function _openy_node_alert_mark_old_fields_not_required(): void {
