@@ -108,10 +108,12 @@ function _openy_node_alert_alter_node_alert_form(&$form): void {
   ];
 
   foreach ($fields_to_toggle as $field_name) {
-    $form[$field_name]['widget']['#states'] = [
-      'visible' => [
-        ':input[name="field_alert_style"]' => ['value' => 'classic'],
-      ],
-    ];
+    if (!empty($form[$field_name]['widget'])) {
+      $form[$field_name]['widget']['#states'] = [
+        'visible' => [
+          ':input[name="field_alert_style"]' => ['value' => 'classic'],
+        ],
+      ];
+    }
   }
 }
