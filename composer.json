@@ -4,7 +4,7 @@
   "type": "drupal-module",
   "require": {
     "ycloudyusa/yusaopeny": "*",
-    "drupal/ctools": ">=3.13"
+    "drupal/ctools": "*"
   },
   "license": "GPL-2.0+",
   "minimum-stability": "dev"
