@@ -207,7 +207,7 @@ class AlertsRestResource extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
 
-    $uri = $this->request->query->get('uri');
+    $uri = $this->request->query->get('uri') ?? '';
 
     // Extract the language code from the URI.
     $langcode = substr($uri, 1, 2);
