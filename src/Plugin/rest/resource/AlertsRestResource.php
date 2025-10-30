@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 
 /**
@@ -206,43 +207,47 @@ class AlertsRestResource extends ResourceBase {
     if (!$this->currentUser->hasPermission('access content')) {
       throw new AccessDeniedHttpException();
     }
+    try {
+      $uri = $this->request->query->get('uri') ?? '';
 
-    $uri = $this->request->query->get('uri') ?? '';
+      // Extract the language code from the URI.
+      $langcode = substr($uri, 1, 2);
+      $language = $this->languageManager->getLanguage($langcode);
+      $alert_language = NULL;
+      if ($language) {
+        $alert_language = $language->getId();
+      }
 
-    // Extract the language code from the URI.
-    $langcode = substr($uri, 1, 2);
-    $language = $this->languageManager->getLanguage($langcode);
-    $alert_language = NULL;
-    if ($language) {
-      $alert_language = $language->getId();
+      // Check if the first segment is a valid language code.
+      $request_langcode = substr($this->request->getPathInfo(), 1, 2);
+      $request_language = $this->languageManager->getLanguage($request_langcode);
+
+      if ($language && !$request_language || $request_language && $request_language->getId() != $alert_language) {
+        // Redirect to the same request URL with the language code added after the basePath.
+        $base_path = $this->request->getBasePath();
+        $redirectUrl = $this->request->getSchemeAndHttpHost()
+          . $base_path . '/'
+          . $langcode
+          . str_replace($base_path, '', $this->request->getRequestUri());
+        // Sets the HTTP Status code to 303 - See Other.
+        $response = new ModifiedResourceResponse(NULL, 303);
+        $response->headers->set('Location', $redirectUrl);
+        return $response;
+      }
+
+      $result = $this->router->match($uri);
+      if (!isset($result['node'])) {
+        return new ModifiedResourceResponse('Node not found');
+      }
+
+      [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node'], $alert_language);
+
+      $this->moduleHandler->alter('openy_node_alert_get', $sendAlerts, $alerts);
+
+      return new ModifiedResourceResponse($sendAlerts, 200);
     }
-
-    // Check if the first segment is a valid language code.
-    $request_langcode = substr($this->request->getPathInfo(), 1, 2);
-    $request_language = $this->languageManager->getLanguage($request_langcode);
-
-    if ($language && !$request_language || $request_language && $request_language->getId() != $alert_language) {
-      // Redirect to the same request URL with the language code added after the basePath.
-      $base_path = $this->request->getBasePath();
-      $redirectUrl = $this->request->getSchemeAndHttpHost()
-        . $base_path . '/'
-        . $langcode
-        . str_replace($base_path, '', $this->request->getRequestUri()) ;
-      // Sets the HTTP Status code to 303 - See Other.
-      $response = new ModifiedResourceResponse(NULL, 303);
-      $response->headers->set('Location', $redirectUrl);
-      return $response;
-    }
-
-    $result = $this->router->match($uri);
-    if (!isset($result['node'])) {
+    catch (ResourceNotFoundException $e) {
       return new ModifiedResourceResponse('Node not found');
     }
-
-    [$sendAlerts, $alerts] = $this->alertManager->getAlerts($result['node'], $alert_language);
-
-    $this->moduleHandler->alter('openy_node_alert_get', $sendAlerts, $alerts);
-
-    return new ModifiedResourceResponse($sendAlerts, 200);
   }
 }
