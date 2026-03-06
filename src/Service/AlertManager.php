@@ -200,8 +200,14 @@ class AlertManager {
     /** @var \Drupal\node\Entity\Node $alert */
     foreach ($alerts as $alert) {
       // Filter alerts to remove alerts not listed by alert service for this uri.
+      // Allow location-based alerts through if they match the current page via
+      // Visibility Pages, so an alert can target both a location and specific pages.
       if (!empty($service_alert_ids) && !in_array($alert->id(), $service_alert_ids)) {
-        continue;
+        $hasLocation = $alert->hasField('field_alert_location')
+          && !$alert->field_alert_location->isEmpty();
+        if (!$hasLocation || !$this->checkVisibility($alert, $node)) {
+          continue;
+        }
       }
 
       // Load the translation content.
