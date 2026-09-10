@@ -13,12 +13,46 @@ use Drupal\Core\Form\FormStateInterface;
  * Implements hook_preprocess_node().
  */
 function openy_node_alert_preprocess_page(&$variables) {
-  $variables['#attached']['library'][] = 'openy_node_alert/alert';
+  // The alert widget is a front-end only feature. Its JS (openy-alerts) walks
+  // the page DOM assuming a full front-end layout (<header>, #main, .pre-footer)
+  // and throws an uncaught TypeError when those anchors are absent, e.g. on the
+  // node add/edit forms. That aborts the remaining Drupal.attachBehaviors pass,
+  // which on Carnation leaves the "Save" button unrendered. Never load it on
+  // admin routes or node CRUD forms.
+  if (!_openy_node_alert_is_backend_route()) {
+    $variables['#attached']['library'][] = 'openy_node_alert/alert';
+  }
 
   $node = \Drupal::routeMatch()->getParameter('node');
   if ($node instanceof \Drupal\node\NodeInterface) {
     \Drupal::service('openy_node_alert.alert_manager')->getAlerts($node);
   }
+}
+
+/**
+ * Checks whether the current route is a backend route the alert widget must skip.
+ *
+ * Relies on the route object rather than drupalSettings.path.currentPathIsAdmin,
+ * which the widget's JS already checks but which is not reliably populated when
+ * the form renders in the front-end theme.
+ *
+ * @return bool
+ *   TRUE for admin routes and node add/edit/delete forms.
+ */
+function _openy_node_alert_is_backend_route(): bool {
+  $route_match = \Drupal::routeMatch();
+
+  if (\Drupal::service('router.admin_context')->isAdminRoute($route_match->getRouteObject())) {
+    return TRUE;
+  }
+
+  $node_form_routes = [
+    'node.add_page',
+    'node.add',
+    'entity.node.edit_form',
+    'entity.node.delete_form',
+  ];
+  return in_array($route_match->getRouteName(), $node_form_routes, TRUE);
 }
 
 /**
